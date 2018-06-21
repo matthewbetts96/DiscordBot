@@ -343,7 +343,7 @@ function resetMapPool(message)
 
 function info(message)
 {
-	message.channel.send("SODBOT 2.0.\nWritten by mbetts in Node js 7.7.2.\nOriginal SODBOT work by Scoutspirit and Chickendew.\nFind any bugs? Ping mbetts for fixes/troubleshooting.");
+	message.channel.send("SODBOT 2.0.\nWritten by mbetts in Node js 7.7.2.\nHosted by Valh on EC2.\nOriginal SODBOT work by Scoutspirit and Chickendew.\nFind any bugs? Ping Mbetts or Valh for fixes/troubleshooting.");
 }
 
 //Obscure bot token behind a hidden config file
