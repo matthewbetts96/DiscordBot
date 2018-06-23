@@ -18,8 +18,6 @@ var allMaps = {"Bois de Limors":true,"Carpiquet":true,"Caumont l'Evente":true,"C
 				,"Cote 112":true,"Mont Ormel":true,"Odon":true,"Omaha":true,"Pegasus Bridge":true,"Pointe du Hoc":true,
 				"Carpiquet-Duellist":true,"Merderet":true,"Odon River":true,"Sainte Mere l'Eglise":true,"Sainte Mere l'Eglise Duellists":true};
 
-
-
 bot.on('message', message => 
 {
 	if(message.content.startsWith(config.prefix))
@@ -29,7 +27,7 @@ bot.on('message', message =>
 		{
 			commands[cmd].replace(" ",""); //replace whitespace with nothing
 		}
-		console.log(commands);
+		//console.log(commands);
 		//lower case everything
 		switch(commands[0].toLowerCase())
 		{
@@ -98,23 +96,30 @@ Screenshot:
 
 function resultGathering(message, commands)
 {
-	var keyWords = ["P1-Name:","P1-Pick:","P1-Ban-1:","P1-Ban-2:","P2-Name:","P2-Pick:","P2-Ban-1:","P2-Ban-2:","Winner:","Screenshot:"];
+	var keyWords = ["results","Map:","P1-Name:","P1-Pick:","P1-Ban-1:","P1-Ban-2:","P2-Name:","P2-Pick:","P2-Ban-1:","P2-Ban-2:","Winner:","Screenshot:"];
 	var res = "";
+	fs = require('fs');
 
-	res = res.concat("Tournament Name: " + commands[1] + "\n")
-	for(key in keyWords)
+	res = res.concat("\n" + commands[1]);
+
+	for(cmd in commands)
 	{
-		for(cmd in commands)
+		for(key in keyWords)
 		{
 			if(commands[cmd].includes(keyWords[key]))
 			{
 				cmd++;
-				res = res.concat(keyWords[key] + " " + commands[cmd] + "\n");
+				res = res.concat(commands[cmd] + ",");
 			}
 		}
 	}
 
-	message.channel.send(res);
+	fs.appendFile('results.csv', res + ",", function (err) {
+		if (err) 
+		{
+			return console.log(err);
+		}
+	}); 
 }
 
 
@@ -251,13 +256,13 @@ function help(message)
         	name: config.prefix +"faction",
         	value: "Picks a random faction."
       	},{
-        	name: config.prefix +"guide", //TODO
+        	name: config.prefix +"guide", //TODO 
         	value: "Displays a list of guides for Steel Division."
       	},{
        		name: config.prefix +"ping",
         	value: "Pings the bot. Prints API Latency."
       	},{
-        	name: config.prefix +"info", //TODO
+        	name: config.prefix +"info", 
         	value: "Shows info about the bot."
       	}]
 	}});
@@ -266,9 +271,15 @@ function help(message)
 //Returns 'Miss' to all users, 50/50 chance of returning 'Hit' to an auth'd user
 function piat(message)
 {
-	if(authorized.indexOf(message.author.id) > -1 && Math.random() > 0.25){
+	if(authorized.indexOf(message.author.id) > -1 && Math.random() < 0.25)
+	{
 		message.reply("Hit!");
-	} else {
+	}
+	else if(Math.random() < 0.40)
+	{
+	} 
+	else 
+	{
 		message.reply("Miss!");
 	}
 }
@@ -278,7 +289,7 @@ function unban(message, commands)
 {
 	var st = cmdAppender(commands)
 	for (key in allMaps) {
-		if(allMaps[key] == false && key == st)
+		if(allMaps[key] == false && key.toLowerCase() == st.toLowerCase())
 		{
 			message.channel.send("--------------------------------------------\n"+ key + " has been unbanned.\n --------------------------------------------");
 			allMaps[key] = true;
@@ -292,7 +303,7 @@ function ban(message, commands)
 {
 	var st = cmdAppender(commands)
 	for (key in allMaps) {
-		if(allMaps[key] == true && key == st)
+		if(allMaps[key] == true && key.toLowerCase() == st.toLowerCase())
 		{
 			message.channel.send("--------------------------------------------\n"+ key + " has been banned.\n--------------------------------------------");
 			allMaps[key] = false;
@@ -343,7 +354,7 @@ function resetMapPool(message)
 
 function info(message)
 {
-	message.channel.send("SODBOT 2.0.\nWritten by mbetts in Node js 7.7.2.\nHosted by Valh on EC2.\nOriginal SODBOT work by Scoutspirit and Chickendew.\nFind any bugs? Ping Mbetts or Valh for fixes/troubleshooting.");
+	message.channel.send("SODBOT 2.0.\nWritten by mbetts in Node js 10.5.0.\nHosted by Valh on EC2.\nOriginal SODBOT work by Scoutspirit and Chickendew.\nFind any bugs? Ping Mbetts or Valh for fixes/troubleshooting.");
 }
 
 //Obscure bot token behind a hidden config file
