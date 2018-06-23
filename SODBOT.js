@@ -11,7 +11,7 @@ bot.on('ready', () => {
 });
 
 //hardcoded auth list,l can change to role based in the future
-var authorized = ["84696940742193152", "211930367693684738"]
+var authorized = ["84696940742193152", "211930367693684738", "237323816647262208"]
 
 //3rd line is 3v3 (and less) only
 var allMaps = {"Bois de Limors":true,"Carpiquet":true,"Caumont l'Evente":true,"Cheux":true,"Colleville":true,"Colombelles":true
@@ -277,6 +277,7 @@ function piat(message)
 	}
 	else if(Math.random() < 0.40)
 	{
+		message.reply("Ping! Your shot bounced!");
 	} 
 	else 
 	{
