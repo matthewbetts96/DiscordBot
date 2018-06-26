@@ -10,118 +10,218 @@ bot.on('ready', () => {
   console.log('I am ready!');
 });
 
-//hardcoded auth list,l can change to role based in the future
-var authorized = config.authIds;
-
 //3rd line is 3v3 (and less) only
 var allMaps = {"Bois de Limors":true,"Carpiquet":true,"Caumont l'Evente":true,"Cheux":true,"Colleville":true,"Colombelles":true
 				,"Cote 112":true,"Mont Ormel":true,"Odon":true,"Omaha":true,"Pegasus Bridge":true,"Pointe du Hoc":true,
 				"Carpiquet-Duellist":true,"Merderet":true,"Odon River":true,"Sainte Mere l'Eglise":true,"Sainte Mere l'Eglise Duellists":true};
 
+var divs = ["3rd Armoured","4th Armoured","101st Airborne","2nd Infantry","2e Blindee","Demi-Brigade SAS","7th Armoured","Guards Armoured",
+			"6th Airborne","15th Infantry","1st SSB","3rd Canadian Infantry", "1 Pancerna", "1st Infantry", "-----------","Panzer-Lehr",
+			"12. SS-Panzer","1. SS-Panzer","2. Panzer","9. Panzer","21. Panzer", "116. Panzer", "17. SS-Panzergrenadier", "3. Fallschirmjager",
+			"16. Luftwaffe", "91. Luftlande", "Festung Groß-Paris","352. Infanterie", "716. Infanterie"];
+//time since the last time a command was called
+var lastrequestTime = 0;
+var currentTime = new Date().getTime();
+
 bot.on('message', message => 
 {
 	if(message.content.startsWith(config.prefix))
 	{
-		var commands = message.content.substring(1,message.content.length).split(/\n| /); //split on a new line and spaces
-		for(cmd in commands)
+		if(rateLimiter())
 		{
-			commands[cmd].replace(" ",""); //replace whitespace with nothing
-		}
-		//console.log(commands);
-		//lower case everything
-		switch(commands[0].toLowerCase())
-		{
-			case "info":
-				info(message)
-				break;
-			case "piat":
-				piat(message)
-				break;
-			case "ping":
-				ping(message)
-				break;
-			case "help":
-				help(message)
-				break;
-			case "flip":
-				flip(message)
-				break;   
-			case "faction":
-				faction(message)
-				break;
-			case "ban":
-				ban(message, commands)
-				break;
-			case "unban":
-				unban(message, commands)
-				break;
-			case "guide":
-				guide(message)
-				break;
-			case "maps":
-				maps(message)
-				break;
-			case "map":
-				map(message, commands)
-				break;
-			case "reset":
-				resetMapPool(message)
-				break;
-			case "results": 
-				resultGathering(message, commands)
-				break;
-			default:
-				break;
-		}
+			findCommand(message);
+		} 
 	}
 });
+
+function findCommand(message)
+{
+	var commands = message.content.substring(1,message.content.length).split(/\n| /); //split on a new line and spaces
+	for(cmd in commands)
+	{
+		commands[cmd].replace(" ",""); //replace whitespace with nothing
+	}
+	console.log(commands);
+	//lower case everything
+	switch(commands[0].toLowerCase())
+	{
+		case "info":
+			info(message)
+			break;
+		case "piat":
+			piat(message)
+			break;
+		case "ping":
+			ping(message)
+			break;
+		case "help":
+			help(message)
+			break;
+		case "flip":
+			flip(message)
+			break;   
+		case "faction":
+			faction(message)
+			break;
+		case "ban":
+			ban(message, commands)
+			break;
+		case "unban":
+			unban(message, commands)
+			break;
+		case "guide":
+			guide(message)
+			break;
+		case "maps":
+			maps(message)
+			break;
+		case "map":
+			map(message, commands)
+			break;
+		case "reset":
+			resetMapPool(message)
+			break;
+		case "results": 
+			resultGathering(message, commands)
+			break;
+		case "allmaps":
+			allmaps(message)
+			break;
+		case "alldivs":
+			alldivs(message)
+			break;
+		default:
+			break;
+	}
+}
+
+function allmaps(message)
+{
+	var res = "";
+	for (var key in allMaps) {
+		res = res.concat(key + "\n");
+	}
+	res = res.substring(0, res.length - 1);
+	message.channel.send(res);
+}
+
+function alldivs(message)
+{
+	var res = "";
+	for (dv in divs) {
+		res = res.concat(divs[dv] + "\n");
+	}
+	res = res.substring(0, res.length - 1);
+	message.channel.send(res);
+}
+
+
+//A simple rate limiter
+//Ignores requests if they are within 1 second of eachother and will 
+//not respond unless one second has passed since the last request (currently subject to change)
+function rateLimiter()
+{
+	var currentTime = new Date().getTime();
+	if(currentTime - lastrequestTime > 1000)
+	{
+		lastrequestTime = currentTime;
+		return true;
+	} 
+	else 
+	{
+		console.log("Too much spam detected");
+		return false;
+	}
+}
+
+
 
 /*
 How results should be posted (MUST BE ONE COMMENT) replays must go as a seperate comment below
 
-(PREFIX)results TOURNAMENT_NAME 
-Map: 
-P1-Name:
-P1-Pick:
-P1-Ban-1:
-P1-Ban-2:
-P2-Name:
-P2-Pick:
-P2-Ban-1:
-P2-Ban-2:
-Winner:
-Screenshot:
+$results
+Map-Played: <>
+Winner: <>
+-------------
+P1-Name: <>
+P1-Pick: <>
+P1-Div-Ban-1: <>
+P1-Div-Ban-2: <>
+P1-Map-Ban-1: <>
+P1-Map-Ban-2: <>
+-------------
+P2-Name: <>
+P2-Pick: <>
+P2-Div-Ban-1: <>
+P2-Div-Ban-2: <>
+P2-Map-Ban-1: <>
+P2-Map-Ban-2: <>
+-------------
+Screenshot: <> <-WE RECCOMEND UPLOADING TO IMGUR/REDDIT OR ANOTHER IMAGE HOSTING SITE RATHER THAN DIRECT UPLOAD TO DISCORD
 
 */
 
-function resultGathering(message, commands)
+function resultGathering(message, input)
 {
-	var keyWords = ["results","Map:","P1-Name:","P1-Pick:","P1-Ban-1:","P1-Ban-2:","P2-Name:","P2-Pick:","P2-Ban-1:","P2-Ban-2:","Winner:","Screenshot:"];
+	var keyWords = ["Map-Played:","Winner:","P1-Name:","P1-Pick:","P1-Div-Ban-1:","P1-Div-Ban-2:","P1-Map-Ban-1:","P1-Map-Ban-2:",
+					"P2-Name:","P2-Pick:","P2-Div-Ban-1:","P2-Div-Ban-2:","P2-Map-Ban-1:","P2-Map-Ban-2:","Screenshot:"];
 	var res = "";
 	fs = require('fs');
+	var continueLooking = true;
 
-	res = res.concat("\n" + commands[1]);
-
-	for(cmd in commands)
+	//for each keyword
+	for(key in keyWords)
 	{
-		for(key in keyWords)
+		//loop through each input
+		for(i in input)
 		{
-			if(commands[cmd].includes(keyWords[key]))
+			//if the input at pos 'i' includes the keyword
+			if(input[i].includes(keyWords[key]))
 			{
-				cmd++;
-				res = res.concat(commands[cmd] + ",");
+				var j = i;
+				++j;
+				//loop until we say stop
+				while(continueLooking)
+				{
+					res = res.concat(input[j] + " ");
+					//a bit abusive of try catch, but eh
+					try{
+						if(input[j].includes(">"))
+						{
+							continueLooking = false;
+							res = res.concat(",");
+						}
+					} 
+					// it will always throw an error on the very final input 
+					// because includes on 'undefined' is invalid
+					catch(err) 
+					{
+						continueLooking = false;
+						res = res.concat(",");
+					}
+					++j;
+				}
 			}
+			continueLooking = true;
 		}
 	}
+
+	//now we replace all '<','>'
+	for(st in res)
+	{
+		res = res.replace(">","");
+		res = res.replace("<","")
+	}
+	res = res.concat("\n");
 
 	fs.appendFile('results.csv', res + ",", function (err) {
 		if (err) 
 		{
 			return console.log(err);
 		}
-	}); 
+	});
+	message.reply("Results recorded. Values entered were: " + res);
 }
-
 
 function maps(message)
 {
@@ -161,7 +261,7 @@ function map(message, commands)
 			printMap(message, 16)
 			break;
 		case "4v4":
-			printMap(message, 11)
+			printMap(message, 11) //only first 11 maps are 4v4 compatable
 			break;
 		default:
 			message.reply("Unknown size parameter. Please use 1v1, 2v2 etc")
@@ -233,7 +333,7 @@ function help(message)
     	},
 		fields: [{
         	name: config.prefix + "help",
-        	value: "Shows this message."
+        	value: "Shows this message. \nUsage: $help" 
       	},{
         	name: config.prefix +"maps",
         	value: "Displays all maps and their banned state."
@@ -243,27 +343,35 @@ function help(message)
       	},{
         	name: config.prefix +"ban MAP_NAME",
         	value: "Bans a map."
+      		name: config.prefix +"maps",
+        	value: "Displays all maps and their banned state.\nUsage: $maps"
+      	},{
+        	name: config.prefix +"ban",
+        	value: "Bans a map.\nUsage: $ban Carpiquet"
       	},{
         	name: config.prefix +"reset",
-        	value: "Resets all the map bans."
+        	value: "Resets all the map bans.\nUsage: $reset"
       	},{
         	name: config.prefix +"piat",
-        	value: "Fires SOD-BOT's piat! Are you able to hit?"
+        	value: "Fires SOD-BOT's piat! Are you able to hit?\nUsage: $piat"
       	},{
         	name: config.prefix +"flip",
-        	value: "Flips a coin."
+        	value: "Flips a coin.\nUsage: $flip"
       	},{
         	name: config.prefix +"faction",
-        	value: "Picks a random faction."
+        	value: "Picks a random faction.\nUsage: $faction"
       	},{
-        	name: config.prefix +"guide", //TODO 
-        	value: "Displays a list of guides for Steel Division."
+        	name: config.prefix +"guide", //TODO need to fill this with more stuff
+        	value: "Displays a list of guides for Steel Division.\nUsage: $guide"
       	},{
        		name: config.prefix +"ping",
-        	value: "Pings the bot. Prints API Latency."
+        	value: "Pings the bot. Prints API Latency.\nUsage: $ping"
       	},{
         	name: config.prefix +"info", 
-        	value: "Shows info about the bot."
+        	value: "Shows info about the bot.\nUsage: $info"
+      	},{
+        	name: config.prefix +"results", 
+        	value: "Please consult your specific tournaments PDF on how to properly submit results."
       	}]
 	}});
 }
@@ -271,11 +379,11 @@ function help(message)
 //Returns 'Miss' to all users, 50/50 chance of returning 'Hit' to an auth'd user
 function piat(message)
 {
-	if(authorized.indexOf(message.author.id) > -1 && Math.random() < 0.25)
+	if(Math.random() < 0.01)
 	{
 		message.reply("Hit!");
 	}
-	else if(Math.random() < 0.40)
+	else if(Math.random() < 0.30)
 	{
 		message.reply("Ping! Your shot bounced!");
 	} 
@@ -355,7 +463,6 @@ function resetMapPool(message)
 
 function info(message)
 {
-	message.channel.send("SODBOT 2.0.\nWritten by mbetts in Node js 10.5.0.\nHosted by Valh on EC2.\nOriginal SODBOT work by Scoutspirit and Chickendew.\nFind any bugs? Ping Mbetts or Valh for fixes/troubleshooting.");
 }
 
 //Obscure bot token behind a hidden config file
