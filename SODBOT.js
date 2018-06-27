@@ -19,6 +19,7 @@ var divs = ["3rd Armoured","4th Armoured","101st Airborne","2nd Infantry","2e Bl
 			"6th Airborne","15th Infantry","1st SSB","3rd Canadian Infantry", "1 Pancerna", "1st Infantry", "-----------","Panzer-Lehr",
 			"12. SS-Panzer","1. SS-Panzer","2. Panzer","9. Panzer","21. Panzer", "116. Panzer", "17. SS-Panzergrenadier", "3. Fallschirmjager",
 			"16. Luftwaffe", "91. Luftlande", "Festung Groß-Paris","352. Infanterie", "716. Infanterie"];
+
 //time since the last time a command was called
 var lastrequestTime = 0;
 var currentTime = new Date().getTime();
@@ -41,7 +42,6 @@ function findCommand(message)
 	{
 		commands[cmd].replace(" ",""); //replace whitespace with nothing
 	}
-	console.log(commands);
 	//lower case everything
 	switch(commands[0].toLowerCase())
 	{
@@ -212,9 +212,10 @@ function resultGathering(message, input)
 		res = res.replace(">","");
 		res = res.replace("<","")
 	}
+	res = res.substring(0, res.length - 2);
 	res = res.concat("\n");
 
-	fs.appendFile('results.csv', res + ",", function (err) {
+	fs.appendFile('results.csv', res, function (err) {
 		if (err) 
 		{
 			return console.log(err);
@@ -335,14 +336,15 @@ function help(message)
         	name: config.prefix + "help",
         	value: "Shows this message. \nUsage: $help" 
       	},{
-        	name: config.prefix +"maps",
-        	value: "Displays all maps and their banned state."
+        	name: config.prefix +"allmaps",
+        	value: "Displays all maps.\nUsage: $allmaps"
       	},{
-        	name: config.prefix +"map (1v1/2v2/3v3/4v4)",
-        	value: "Picks a random, unbanned map of the defined size."
+        	name: config.prefix +"alldivs",
+        	value: "Displays all divisions.\nUsage: $alldivs"
       	},{
-        	name: config.prefix +"ban MAP_NAME",
-        	value: "Bans a map."
+        	name: config.prefix +"map",
+        	value: "Picks a random, unbanned map of the defined size.\nUsage: $maps 1v1|2v2|3v3|4v4"
+      	},{
       		name: config.prefix +"maps",
         	value: "Displays all maps and their banned state.\nUsage: $maps"
       	},{
@@ -463,6 +465,7 @@ function resetMapPool(message)
 
 function info(message)
 {
+	message.channel.send("SODBOT 2.1.0\nWritten by mbetts in Node js 10.5.0.\nHosted by Valh on EC2.\nOriginal SODBOT work by Scoutspirit and Chickendew.\nFind any bugs? Ping Mbetts or Valh for fixes/troubleshooting.");
 }
 
 //Obscure bot token behind a hidden config file
