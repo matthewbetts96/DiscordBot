@@ -28,10 +28,7 @@ bot.on('message', message =>
 {
 	if(message.content.startsWith(config.prefix))
 	{
-		if(rateLimiter())
-		{
-			findCommand(message);
-		} 
+		findCommand(message); 
 	}
 });
 
@@ -49,7 +46,10 @@ function findCommand(message)
 			info(message)
 			break;
 		case "piat":
-			piat(message)
+			if(rateLimiter())
+			{
+				piat(message)
+			}
 			break;
 		case "ping":
 			ping(message)
