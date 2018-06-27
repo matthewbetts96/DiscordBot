@@ -95,27 +95,6 @@ function findCommand(message)
 	}
 }
 
-function allmaps(message)
-{
-	var res = "";
-	for (var key in allMaps) {
-		res = res.concat(key + "\n");
-	}
-	res = res.substring(0, res.length - 1);
-	message.channel.send(res);
-}
-
-function alldivs(message)
-{
-	var res = "";
-	for (dv in divs) {
-		res = res.concat(divs[dv] + "\n");
-	}
-	res = res.substring(0, res.length - 1);
-	message.channel.send(res);
-}
-
-
 //A simple rate limiter
 //Ignores requests if they are within 1 second of eachother and will 
 //not respond unless one second has passed since the last request (currently subject to change)
@@ -134,7 +113,27 @@ function rateLimiter()
 	}
 }
 
+function allmaps(message)
+{
+	var res = "";
+	for (var key in allMaps) 
+	{
+		res = res.concat(key + "\n");
+	}
+	res = res.substring(0, res.length - 1);
+	message.channel.send(res);
+}
 
+function alldivs(message)
+{
+	var res = "";
+	for (var dv of divs) 
+	{
+		res = res.concat(dv + "\n");
+	}
+	res = res.substring(0, res.length - 1);
+	message.channel.send(res);
+}
 
 /*
 How results should be posted (MUST BE ONE COMMENT) replays must go as a seperate comment below
@@ -178,14 +177,17 @@ function resultGathering(message, input)
 			//if the input at pos 'i' includes the keyword
 			if(input[i].includes(keyWords[key]))
 			{
+				//increment one over to the word next to the keyword
 				var j = i;
 				++j;
 				//loop until we say stop
 				while(continueLooking)
 				{
+					//concat every word until one of them contains a >, this denotes the end of the entry
 					res = res.concat(input[j] + " ");
 					//a bit abusive of try catch, but eh
-					try{
+					try 
+					{
 						if(input[j].includes(">"))
 						{
 							continueLooking = false;
@@ -212,6 +214,7 @@ function resultGathering(message, input)
 		res = res.replace(">","");
 		res = res.replace("<","")
 	}
+	//delete the very last space and ',' and add a new line
 	res = res.substring(0, res.length - 2);
 	res = res.concat("\n");
 
@@ -221,6 +224,9 @@ function resultGathering(message, input)
 			return console.log(err);
 		}
 	});
+
+	//Return a message with what was entered, this is to give feedback on 
+	//results entered without having to go and check the file itself
 	message.reply("Results recorded. Values entered were: " + res);
 }
 
@@ -230,7 +236,8 @@ function maps(message)
 	var st2 = "";
 	var res = "";
 
-	for (var key in allMaps) {
+	for (var key in allMaps) 
+	{
 		st1 = key + " is " + allMaps[key] + "\n"
 		st2 = st2.concat(st1);
 	}
@@ -243,10 +250,12 @@ function maps(message)
 
 function map(message, commands)
 {
-	try {
+	try 
+	{
 		var st = commands[1].toLowerCase() 
 	}
-	catch(err) {
+	catch(err) 
+	{
 		console.log("ERROR: Cannot lowercase nothing. Throwing exception.")
 		st = "";
 	}
@@ -273,7 +282,8 @@ function printMap(message, num)
 {
 	var rnd = Math.floor(Math.random()*num);
 	var i = 0;
-	for (key in allMaps) {
+	for (key in allMaps) 
+	{
 		if(rnd == i)
 		{
 			if(allMaps[key] == false)
@@ -399,7 +409,8 @@ function piat(message)
 function unban(message, commands)
 {
 	var st = cmdAppender(commands)
-	for (key in allMaps) {
+	for (key in allMaps) 
+	{
 		if(allMaps[key] == false && key.toLowerCase() == st.toLowerCase())
 		{
 			message.channel.send("--------------------------------------------\n"+ key + " has been unbanned.\n --------------------------------------------");
@@ -413,7 +424,8 @@ function unban(message, commands)
 function ban(message, commands)
 {
 	var st = cmdAppender(commands)
-	for (key in allMaps) {
+	for (key in allMaps) 
+	{
 		if(allMaps[key] == true && key.toLowerCase() == st.toLowerCase())
 		{
 			message.channel.send("--------------------------------------------\n"+ key + " has been banned.\n--------------------------------------------");
@@ -458,14 +470,15 @@ function cmdAppender(commands)
 function resetMapPool(message)
 {
 	message.channel.send("Map pool reset.");
-	for (key in allMaps) {
+	for (key in allMaps) 
+	{
 		allMaps[key] = true;
 	}
 }
 
 function info(message)
 {
-	message.channel.send("SODBOT 2.1.0\nWritten by mbetts in Node js 10.5.0.\nHosted by Valh on EC2.\nOriginal SODBOT work by Scoutspirit and Chickendew.\nFind any bugs? Ping Mbetts or Valh for fixes/troubleshooting.");
+	message.channel.send("SODBOT 2.1.1\nWritten by mbetts in Node js 10.5.0.\nHosted by Valh on EC2.\nOriginal SODBOT work by Scoutspirit and Chickendew.\nFind any bugs? Ping mbetts or Valh for fixes/troubleshooting.");
 }
 
 //Obscure bot token behind a hidden config file
