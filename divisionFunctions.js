@@ -190,7 +190,7 @@ function divSide(message, commands)
 	switch(st)
 	{
 		case "allies":
-			message.channel.send(selectRandDivAxis(message));
+			message.channel.send(selectRandDivAllies(message));
 			break;
 		case "axis":
 			message.channel.send(selectRandDivAxis(message));
@@ -250,6 +250,7 @@ function randomSetup(message, commands)
 	var playersNum = "1"
 	var alliedDivs = "";
 	var axisDivs = "";
+	var playersNum = "";
 	try 
 	{
 		var playersNum = commands[1].charAt(0);
@@ -268,10 +269,17 @@ function randomSetup(message, commands)
 	}
 
 	var res = "";
-	res = res.concat(alliedDivs + "\n");
-	res = res.concat("-----------VS-----------\n");
-	res = res.concat(axisDivs + "\n");
-	res = res.concat("-----------on-----------\n");
-	message.channel.send(res);
-	maps.rmap(message, commands);
+	if(playersNum != "")
+	{
+		res = res.concat(alliedDivs + "\n");
+		res = res.concat("-----------VS-----------\n");
+		res = res.concat(axisDivs + "\n");
+		res = res.concat("-----------on-----------\n");
+		message.channel.send(res);
+		maps.rmap(message, commands);
+	} 
+	else 
+	{
+		message.reply("Unknown size parameter. Please use 1v1, 2v2 etc");
+	}
 }
