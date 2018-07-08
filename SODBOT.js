@@ -75,7 +75,7 @@ function findCommand(message)
 			
 		//misc commands
 		case "panzerfaust":
-		case "panzershreck":
+		case "panzerschreck":
 		case "bazooka":
 		case "grenade":
 		case "gammonbomb":
