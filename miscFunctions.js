@@ -245,6 +245,7 @@ function flip(message, commands)
 //Returns a simple info card about the bot
 function info(message, commands)
 {
+	message.channel.send("SODBOT 2.3.0\nWritten by mbetts in Node js 11.3.0.\nHosted by Valh on EC2.\nOriginal SODBOT by Scoutspirit and Chickendew.\nFind any bugs? Ping mbetts for fixes & troubleshooting or make a new issue on the Github page here:\n https://github.com/matthewbetts96/DiscordBot");
 }
 
 //Returns embedded message of all current commands

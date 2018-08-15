@@ -112,6 +112,7 @@ function findCommand(message)
 			gathering.register(message, commands);
 			break;
 		case "template":
+			gathering.returnTemplate(message, commands);
 			break;
 		case "playerresults":
 			gathering.playerResults(message, commands);
