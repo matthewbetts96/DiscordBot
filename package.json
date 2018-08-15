@@ -9,6 +9,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "discord.js": "^11.0.0"
+    "ascii-table": "0.0.9",
+    "discord.js": "^11.3.2",
+    "jsonfile": "^4.0.0",
+    "mysql": "^2.16.0",
+    "sqlite3": "^4.0.2"
   }
 }

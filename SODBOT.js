@@ -7,10 +7,7 @@ var misc = require("./miscFunctions");
 var maps = require("./mapFunctions");
 var gathering = require("./collectResults");
 
-const token = config.token;
-bot.on('ready', () => {
-  console.log('I am ready!');
-});
+var token = config.token;
 
 bot.on('message', message => 
 {
@@ -107,13 +104,34 @@ function findCommand(message)
 			message.reply("Please specify, ``$banmap`` or ``$bandiv``.")
 			break;
 
+		//stuff to do with results
 		case "results":
-			gathering.resultGathering(message, commands);
+			gathering.inputResults(message, commands);
 			break;
+		case "register":
+			gathering.register(message, commands);
+			break;
+		case "template":
+			break;
+		case "playerresults":
+			gathering.playerResults(message, commands);
+			break;
+		case "mapresults":
+			gathering.mapResults(message, commands);
+			break;
+		case "divresults":
+			gathering.divResults(message, commands);
+			break;
+
+		//admin only commands 
+
+		//don't use this if there is already a database
+		case "createtables":
+			gathering.ADMIN_createTables(message, commands);
+			break;
+
 	}
 }
-
-
 
 //Obscure bot token behind a hidden config file
 bot.login(token);

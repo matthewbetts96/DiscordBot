@@ -44,40 +44,43 @@ function randomMap(message, commands)
 	switch(st)
 	{
 		case "1v1":
-			printMap(message, 16)
+			message.channel.send(printMap(message, 16));
 			break;
 		case "2v2":
-			printMap(message, 16)
+			message.channel.send(printMap(message, 16));
 			break;
 		case "3v3":
-			printMap(message, 16)
+			message.channel.send(printMap(message, 16));
 			break;
 		case "4v4":
-			printMap(message, 11) //only first 11 maps are 4v4 compatable
+			message.channel.send(printMap(message, 11)); //only first 11 maps are 4v4 compatable
 			break;
 		default:
 			message.reply("Unknown size parameter. Please use 1v1, 2v2 etc")
 	}
+	counter = 0;
 }
 
+//Global counter variable
+var counter = 0;
 function printMap(message, num)
 {
-	var rnd = Math.floor(Math.random()*num);
-	var i = 0;
-	for (key in allMaps) 
+	let rndMap = Math.floor(Math.random()*num);
+	var toReturn = Object.keys(allMaps)[rndMap];
+
+	if(counter > 20)
 	{
-		if(rnd == i)
-		{
-			if(allMaps[key] == false)
-			{
-				printMap(message, num) //NOTE TO SELF: FIX POSSIBLE INFINITE RECURSION PROBLEM WHEN ALL MAPS ARE BANNED 
-			} 
-			else 
-			{
-				message.channel.send(key);
-			}
-		}
-		i++;
+		counter = 0;
+		return "Error in picking map."
+	} 
+	else if(allMaps[Object.keys(allMaps)[rndMap]] == false) 
+	{
+		counter++;
+		return printMap(message, num);
+	}
+	else
+	{
+		return toReturn;
 	}
 }
 

@@ -47,6 +47,8 @@ module.exports = {
 	}
 };
 
+//Global counter variable
+var counter = 0;
 
 function printAllDivs(message, commands)
 {
@@ -128,7 +130,7 @@ function unban(message, commands)
 	{
 		if(allies[div] == false && div.toLowerCase() == st.toLowerCase())
 		{
-			message.channel.send("--------------------------------------------\n"+ div + " has been banned.\n--------------------------------------------");
+			message.channel.send("--------------------------------------------\n"+ div + " has been unbanned.\n--------------------------------------------");
 			allies[div] = true;
 		}
 	}
@@ -137,43 +139,13 @@ function unban(message, commands)
 	{
 		if(axis[div] == false && div.toLowerCase() == st.toLowerCase())
 		{
-			message.channel.send("--------------------------------------------\n"+ div + " has been banned.\n--------------------------------------------");
+			message.channel.send("--------------------------------------------\n"+ div + " has been unbanned.\n--------------------------------------------");
 			axis[div] = true;
 		}
 	}
 	bannedDivs(message, commands);
 }	
 
-/*
-turns the rest of the comment into a single string rather than in seperate list indexes
-
-ie. 
-message = ban pointe du hoc 
-commands[0] = ban
-commands[1] = pointe
-commands[2] = du
-commands[3] = hoc
-
-returns commands[1] -> commands[size] as a string concat
-
-ie. returns 'pointe du hoc' 
-*/ 
-function cmdAppender(commands)
-{
-	var res = "";
-	var i = 0;
-	for(st in commands)
-	{
-		if(i >= 1)
-		{
-			res = res.concat(commands[st]);
-			res = res.concat(" ");
-		}
-		i++;
-	}
-	res = res.slice(0, -1); //slice off the last space 
-	return res;
-}
 //takes an input (allies || axis) and (calls a function that) outputs a random division from that side
 function divSide(message, commands)
 {
@@ -197,50 +169,47 @@ function divSide(message, commands)
 			break;
 		default:
 			message.reply("Unknown side parameter. Please use 'allies' or 'axis'.");
-	}	
+	}
+	counter = 0;	
 }
 
 //Returns a random allies faction if it is true, else, repeats
 function selectRandDivAllies(message)
 {
-	var rnd = Math.floor(Math.random()*14);
-	var i = 0;
-	for(div in allies)
+	let rndDiv = Math.floor(Math.random()*Object.keys(allies).length);
+	var toReturn = Object.keys(allies)[rndDiv];
+	if(counter > 20)
 	{
-		if(rnd == i)
-		{
-			if(allies[rnd] == false)
-			{
-				selectRandDivAllies();
-			}
-			else 
-			{
-				return div;
-			}
-		}
-		i++
+		return "Error in picking division."
+	} 
+	else if(allies[Object.keys(allies)[rndDiv]] == false)
+	{
+		counter++;
+		return selectRandDivAllies(message);
+	} 
+	else
+	{
+		return toReturn;
 	}
 }
 
 //Returns a random axis faction if it is true, else, repeats
 function selectRandDivAxis(message)
 {
-	var rnd = Math.floor(Math.random()*14);
-	var i = 0;
-	for(div in axis)
+	let rndDiv = Math.floor(Math.random()*Object.keys(axis).length);
+	var toReturn = Object.keys(axis)[rndDiv];
+	if(counter > 20)
 	{
-		if(rnd == i)
-		{
-			if(axis[rnd] == false)
-			{
-				selectRandDivAxis()
-			}
-			else 
-			{
-				return div;
-			}
-		}
-		i++
+		return "Error in picking division."
+	} 
+	else if(axis[Object.keys(axis)[rndDiv]] == false)
+	{
+		counter++;
+		return selectRandDivAxis(message);
+	} 
+	else
+	{
+		return toReturn;
 	}
 }
 
@@ -282,4 +251,35 @@ function randomSetup(message, commands)
 	{
 		message.reply("Unknown size parameter. Please use 1v1, 2v2 etc");
 	}
+}
+
+/*
+turns the rest of the comment into a single string rather than in seperate list indexes
+
+ie. 
+message = ban pointe du hoc 
+commands[0] = ban
+commands[1] = pointe
+commands[2] = du
+commands[3] = hoc
+
+returns commands[1] -> commands[size] as a string concat
+
+ie. returns 'pointe du hoc' 
+*/ 
+function cmdAppender(commands)
+{
+	var res = "";
+	var i = 0;
+	for(st in commands)
+	{
+		if(i >= 1)
+		{
+			res = res.concat(commands[st]);
+			res = res.concat(" ");
+		}
+		i++;
+	}
+	res = res.slice(0, -1); //slice off the last space 
+	return res;
 }
