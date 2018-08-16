@@ -108,6 +108,9 @@ function findCommand(message)
 		case "results":
 			gathering.inputResults(message, commands);
 			break;
+		case "newresults":
+			gathering.newResults(message, commands);
+			break;
 		case "register":
 			gathering.register(message, commands);
 			break;

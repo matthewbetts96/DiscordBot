@@ -1,7 +1,11 @@
 module.exports = {
 	inputResults: function(message, commands)
 	{
-		 inputResults(message, commands)
+		OLDresultGathering(message, commands)
+	},
+	newResults: function(message, commands)
+	{
+		inputResults(message, commands)
 	},
 	register: function(message, commands)
 	{
@@ -64,9 +68,9 @@ var maps = ["Bois de Limors","Carpiquet","Caumont l'Evente","Cheux","Colleville"
 //prints a template for users to copy and use
 function returnTemplate(message, commands)
 {
-	message.channel.send(config.prefix + "results \nMap-Played: <> \nWinner: <> \n------------- \nP1-Name: <> \nP1-Pick: <> \nP1-Div-Ban-1: <> \nP1-Div-Ban-2: <>" 
+	message.channel.send("```" + config.prefix + "results \nOutcome: <> \nMap-Played: <> \nWinner: <> \nLoser: <> \n------------- \nP1-Name: <> \nP1-Pick: <> \nP1-Div-Ban-1: <> \nP1-Div-Ban-2: <>" 
 	+" \nP1-Div-Ban-3: <> \nP1-Map-Ban-1: <>\nP1-Map-Ban-2: <>\nP1-Map-Ban-3: <>\n-------------\nP2-Name: <>\nP2-Pick: <>\nP2-Div-Ban-1: <>\n"
-	+"P2-Div-Ban-2: <>\nP2-Div-Ban-3: <> \nP2-Map-Ban-1: <>\nP2-Map-Ban-2: <>\nP2-Map-Ban-3: <>\n")
+	+"P2-Div-Ban-2: <>\nP2-Div-Ban-3: <> \nP2-Map-Ban-1: <>\nP2-Map-Ban-2: <>\nP2-Map-Ban-3: <> ```\nPlease place the outcome **inside** of the <> and delete any that are not applicable that appear below the first dotted line.")
 }
 
 function ADMIN_createTables(message, commands)
@@ -151,11 +155,9 @@ function ADMIN_createTables(message, commands)
 }
 
 
-//the 'main' function that calls all the other function
+//the 'new' way of submitting results
 function inputResults(message, commands)
 {	
-	message.channel.send("If you are submitting for a tournament on SODBOT 2.2.0 ignore the error messages. As long as you get a ping back from the bot, your results have gone through.")
-	OLDresultGathering(message, commands)
 	//leave method if the author of the message is not registered
 	if(!userIsRegistered(message.author.id))
 	{
@@ -786,7 +788,7 @@ function mapResults(message, commands)
 	table.setHeading('Name','Picks', 'Bans')
 	db.serialize(function() 
 	{
-		db.each('SELECT * FROM mapResults ORDER BY Picks DESC', function(err, row)
+		db.each('SELECT * FROM mapResults ORDER BY' + sortBy + 'DESC', function(err, row)
 		{
 			if (err) 
 			{
@@ -834,7 +836,7 @@ function divResults(message, commands)
 
 	db.serialize(function() 
 	{
-		db.each('SELECT * FROM divResults ORDER BY Wins DESC LIMIT 20', function(err, row)
+		db.each('SELECT * FROM divResults ORDER BY ' + sortBy + ' DESC LIMIT 20', function(err, row)
 		{
 			if (err) 
 			{
@@ -967,7 +969,7 @@ function connect()
 }
 
 
-//This is the OLD way of doing it, once the torunaments using this format are removed, this section will be deleted
+//This is the old way of submitting results, once the torunaments using this format are removed, this section will be deleted (hopefully)
 function OLDresultGathering(message, input)
 {
 	var keyWords = ["Map-Played:","Winner:","P1-Name:","P1-Pick:","P1-Div-Ban-1:","P1-Div-Ban-2:","P1-Div-Ban-3:","P1-Map-Ban-1:","P1-Map-Ban-2:","P1-Map-Ban-3:",
