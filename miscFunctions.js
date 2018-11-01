@@ -82,10 +82,11 @@ function flip(message)
 function info(message)
 {
 	let table = new AsciiTable('Info');
-    table.setHeading('SODBOT 2.3.2');
+    table.setHeading('SODBOT 2.3.3');
 	table.addRow("Written by mbetts in Node js 11.3.0.");
 	table.addRow("Find any bugs? Please make an issue on the Github page below. ")
 	table.addRow("https://github.com/matthewbetts96/DiscordBot");
+	table.addRow("Hosted by Valh on AWS.");
 	table.addRow("Original SODBOT by Scoutspirit and Chickendew.");
 	table.setAlign(0, AsciiTable.CENTER)
     message.channel.send("``"+ table.toString() +"``");
@@ -95,7 +96,7 @@ function shootThing(message)
 {
     if(rateLimiter())
 	{
-      if(Math.random() < 0.75)
+      if(Math.random() < 0.05)
         {
             message.reply(sodbotReplies[Math.floor(Math.random()*sodbotReplies.length)]);
         } 

@@ -81,15 +81,17 @@ function _selectRandDivAllies(message)
 	let toReturn = Object.keys(allies)[rndDiv];
 	if(rdivCounter > 200)
 	{
-		return "Error in picking division."
+		rdivCounter = 0;
+		return "Error in picking division.";
 	} 
-	else if(allies[Object.keys(allies)[rndDiv]] == false)
+	else if(!allies[Object.keys(allies)[rndDiv]])
 	{
 		rdivCounter++;
 		return _selectRandDivAllies(message);
 	} 
 	else
 	{
+		rdivCounter = 0;
 		return toReturn;
 	}
 }
@@ -102,15 +104,17 @@ function _selectRandDivAxis(message)
 
 	if(rdivCounter > 200)
 	{
+		rdivCounter = 0;
 		return "Error in picking division."
 	} 
-	else if(axis[Object.keys(axis)[rndDiv]] == false)
+	else if(!axis[Object.keys(axis)[rndDiv]])
 	{
 		rdivCounter++;
 		return _selectRandDivAxis(message);
 	} 
 	else
 	{
+		rdivCounter = 0;
 		return toReturn;
 	}
 }
