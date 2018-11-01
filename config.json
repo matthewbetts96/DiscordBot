@@ -1,0 +1,10 @@
+{
+	"prefix": "$",
+	"logFileName": "log.txt",
+
+	"module_adminCommands":true,
+	"module_mapCommands":true,
+	"module_divCommands":true,
+	"module_miscCommands":true,
+	"module_resultsCommands":true
+}

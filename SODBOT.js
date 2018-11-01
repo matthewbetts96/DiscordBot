@@ -1,14 +1,20 @@
 const Discord = require('discord.js');
 const bot = new Discord.Client();
 
-var config = require("./config");
-var divisions = require("./divisionFunctions");
-var misc = require("./miscFunctions");
-var maps = require("./mapFunctions");
-var gathering = require("./collectResults");
+const config = require("./config");
+const admin = require("./adminCommands");
+const valid = require("./validateData");
+const query = require("./queryData");
+var log = require("./logging");
 
-var token = config.token;
+const divs = require("./divisionFunctions");
+const misc = require("./miscFunctions");
+const maps = require("./mapFunctions");
+const results = require("./resultsMain");
 
+const token = config.token;
+
+//runs once per message in a channel
 bot.on('message', message => 
 {
 	if(message.content.startsWith(config.prefix))
@@ -19,58 +25,49 @@ bot.on('message', message =>
 
 function findCommand(message)
 {
-	var commands = message.content.substring(1,message.content.length).split(/\n| /); //split on a new line and spaces
-	for(cmd in commands)
+	var command = message.content.substr(1,message.content.length);
+	command = command.replace(/ .*/,'');
+
+	var args = message.content.substr(message.content.indexOf(' ')+1);
+	args = args.split(/,/);
+
+	for(st in args)
 	{
-		commands[cmd].replace(" ",""); //replace whitespace with nothing
+		args[st] = args[st].trim();
 	}
 
-	switch(commands[0].toLowerCase())
+	//Checks if the author is blacklisted, exit if true and log attempt
+	//saves us checking in every function
+	if(admin.userInBlackListFile(message.author.id))
+	{
+		log.blackListedUserAccessAttempt(message, command);
+		return;
+	}
+
+	switch(command.toLowerCase())
 	{
 		//map specific commands
-		case "rmap": //random map
-			maps.rmap(message, commands);
-			break;
-		case "bannedmaps": //all maps with tick or cross
-			maps.bannedMaps(message, commands);
-			break;
-		case "allmaps": // all maps without tick/cross
-			maps.allMaps(message, commands);
-			break;
-		case "banmap": // ban a map
-			maps.banMap(message, commands);
-			break;
-		case "unbanmap": //unban a map
-			maps.unbanMap(message, commands);
-			break;
-		case "resetmaps": //reset the map bannings
-			maps.resetMaps(message, commands);
+		case "rmap": 		//random map
+		case "bannedmaps": 	//all maps with banned/unbanned state
+		case "allmaps": 	//all maps without banned/unbanned state
+		case "banmap": 		//ban a map
+		case "unbanmap": 	//unban a map
+		case "resetmaps": 	//reset the map bannings
+		case "random":
+			maps.mapsEntryLoc(message, command, args)
 			break;
 
-		//division specific commands
-		case "rdiv":
-			divisions.rdiv(message, commands);
+		//map specific commands
+		case "rdiv": 		//random map
+		case "banneddivs": 	//all maps with banned/unbanned state
+		case "alldivs": 	//all maps without banned/unbanned state
+		case "bandiv": 		//ban a map
+		case "unbandiv": 	//unban a map
+		case "resetdivs": 	//reset the map bannings
+			divs.divEntryLoc(message, command, args)
 			break;
-		case "banneddivs": //all divs with tick or cross
-			divisions.bannedDivs(message, commands);
-			break;
-		case "alldivs":
-			divisions.allDivs(message, commands);
-			break;
-		case "bandiv":
-			divisions.banDiv(message, commands);
-			break;
-		case "unbandiv":
-			divisions.unbanDiv(message, commands);
-			break;
-		case "resetdivs":
-			divisions.resetDivs(message, commands);
-			break;
-		case "random":
-			divisions.randomSetup(message, commands);
-			break;
-			
-		//misc commands
+
+		//pew pew!
 		case "panzerfaust":
 		case "panzerschreck":
 		case "bazooka":
@@ -78,64 +75,75 @@ function findCommand(message)
 		case "gammonbomb":
 		case "potato":
 		case "piat":
-			misc.shootThing(message, commands);
-			break;
+		//rest of the misc commands
 		case "guide":
-			misc.guide(message, commands);
-			break;
-		case "flip":
-			misc.flip(message, commands);
-			break;
-		case "faction":
-			misc.faction(message, commands);
-			break;
 		case "info":
-			misc.info(message, commands);
-			break;
+		case "faction":
+		case "flip":
 		case "help":
-			misc.help(message, commands);
-			break;
-
-		//commands that people might get wrong
-		case "reset":
-			message.reply("Please specify, ``$resetmaps`` or ``$resetdivs``.")
-			break;
-		case "ban":
-			message.reply("Please specify, ``$banmap`` or ``$bandiv``.")
-			break;
-
-		//stuff to do with results
-		case "results":
-			gathering.inputResults(message, commands);
-			break;
-		case "newresults":
-			gathering.newResults(message, commands);
-			break;
-		case "register":
-			gathering.register(message, commands);
-			break;
 		case "template":
-			gathering.returnTemplate(message, commands);
+		//case "template": //TODO
+			misc.miscEntryLoc(message, command, args);
+			break;
+
+		//admin commands
+		case "blacklist":
+			admin.blackList(message);
+			break;
+		case "unblacklist":
+			admin.unBlackList(message);
+			break;
+		case "purge":
+			admin.purge(message, args[0]);
+			break;
+		case "createtables":
+			valid.admin_createTables(message);
+			break;
+
+		case "mapresults":
+			query.mapResults(message, args);
 			break;
 		case "playerresults":
-			gathering.playerResults(message, commands);
-			break;
-		case "mapresults":
-			gathering.mapResults(message, commands);
+			query.playerResults(message, args);
 			break;
 		case "divresults":
-			gathering.divResults(message, commands);
+			query.divResults(message, args);
 			break;
 
-		//admin only commands 
-
-		//don't use this if there is already a database
-		case "createtables":
-			gathering.ADMIN_createTables(message, commands);
-			break;
+		//commands that could be mistken
+		case "ban":
+			message.reply("Please specify ``banmap`` or ``bandiv``.");
+			break; 
 
 	}
+
+
+	//This is a specific version of commands used for collecting results only
+	args = message.content.substring(1,message.content.length).split(/\n/); //split on a new line only
+
+	//trim spaces either side of entry
+	for(st in args)
+	{
+		args[st] = args[st].trim();
+	}
+
+	if(args[0].toLowerCase() == "results" || args[0].toLowerCase() == "register")
+	{
+		results.resultsMain(message,args);
+	}	
 }
+
+//runs only when bot comes online
+bot.on('ready', () => {
+	console.log('Bot Online!');
+	//set the activity under the bot in the sidebar
+	bot.user.setActivity("Use " + config.prefix + "help to see commands!")
+});
+
+
+//Catches errors that were causing the bot to crash, I think...
+bot.on('error', console.error);
+
 
 //Obscure bot token behind a hidden config file
 bot.login(token);
