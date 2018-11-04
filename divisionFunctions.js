@@ -51,10 +51,10 @@ function _divEntryLoc(message, command, args)
 
 function rdiv(message, args)
 {
-	var st ="";
+	let st ="";
 	try 
 	{
-		var st = args[0].toLowerCase() 
+		st = args[0].toLowerCase() 
 	}
 	catch(err) 
 	{
@@ -69,8 +69,23 @@ function rdiv(message, args)
 		case "axis":
 			message.reply(_selectRandDivAxis(message));
 			break;
+		case "$rdiv":	//replies with a random div of either side
+			message.reply(bothSidesRandDiv(message));
+			break;
 		default:
-			message.reply("Unknown side parameter. Please use 'allies' or 'axis'.");
+			message.reply("Unknown side parameter. Please use 'allies' or 'axis' or leave blank.");
+	}
+}
+
+function bothSidesRandDiv(message)
+{
+	if(Math.random() >= 0.5)
+	{
+		return _selectRandDivAxis(message);
+	} 
+	else 
+	{
+		return _selectRandDivAllies(message);
 	}
 }
 
@@ -255,7 +270,7 @@ function alldivs(message)
 	message.channel.send("``"+ table.toString() +"``");
 }
 
-function resetdivs()
+function resetdivs(message)
 {
 	for (div in allies) 
 	{

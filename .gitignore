@@ -5,6 +5,9 @@ ehthumbs.db
 # Folder config file
 Desktop.ini
 config.json
+results.db
+log.txt
+players.json
 
 # Recycle Bin used on file shares
 $RECYCLE.BIN/

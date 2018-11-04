@@ -1,6 +1,8 @@
 {
 	"prefix": "$",
 	"logFileName": "log.txt",
+	"version":"2.3.4",
+	"token": "",
 
 	"module_adminCommands":true,
 	"module_mapCommands":true,

@@ -82,7 +82,7 @@ function flip(message)
 function info(message)
 {
 	let table = new AsciiTable('Info');
-    table.setHeading('SODBOT 2.3.3');
+    table.setHeading('SODBOT ' + config.version);
 	table.addRow("Written by mbetts in Node js 11.3.0.");
 	table.addRow("Find any bugs? Please make an issue on the Github page below. ")
 	table.addRow("https://github.com/matthewbetts96/DiscordBot");

@@ -222,8 +222,6 @@ function getUsernameFromID(user)
 	}
 }
 
-
-
 module.exports = {
     commitResults: _commitResults
 }
