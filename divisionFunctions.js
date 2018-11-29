@@ -12,9 +12,6 @@ var axis = {"Panzer-Lehr":true,"12. SS-Panzer":true,"1. SS-Panzer":true,"2. Panz
 			"116. Panzer":true, "17. SS-Panzergrenadier":true, "3. Fallschirmjager":true,"16. Luftwaffe":true, "91. Luftlande":true,
 			"Festung GroB-Paris":true,"352. Infanterie":true, "716. Infanterie":true};
 
-
-var rdivCounter = 0;
-
 function _divEntryLoc(message, command, args)
 {
 	if(!config.module_divCommands)
@@ -64,10 +61,10 @@ function rdiv(message, args)
 	switch(st)
 	{
 		case "allies":
-			message.reply(_selectRandDivAllies(message));
+			message.reply(_selectRandDiv(message,allies));
 			break;
 		case "axis":
-			message.reply(_selectRandDivAxis(message));
+			message.reply(_selectRandDiv(message,axis));
 			break;
 		case "$rdiv":	//replies with a random div of either side
 			message.reply(bothSidesRandDiv(message));
@@ -81,57 +78,20 @@ function bothSidesRandDiv(message)
 {
 	if(Math.random() >= 0.5)
 	{
-		return _selectRandDivAxis(message);
+		return _selectRandDiv(message,allies);
 	} 
 	else 
 	{
-		return _selectRandDivAllies(message);
+		return _selectRandDiv(message,axis);
 	}
 }
 
-//Returns a random allies faction if it is true, else, repeats
-function _selectRandDivAllies(message)
+//Return a random element from @side
+function _selectRandDiv(message,side)
 {
-	let rndDiv = Math.round(Math.random()*Object.keys(allies).length);
-	let toReturn = Object.keys(allies)[rndDiv];
-	if(rdivCounter > 200)
-	{
-		rdivCounter = 0;
-		return "Error in picking division.";
-	} 
-	else if(!allies[Object.keys(allies)[rndDiv]])
-	{
-		rdivCounter++;
-		return _selectRandDivAllies(message);
-	} 
-	else
-	{
-		rdivCounter = 0;
-		return toReturn;
-	}
-}
-
-//Returns a random axis faction if it is true, else, repeats
-function _selectRandDivAxis(message)
-{
-	let rndDiv = Math.round(Math.random()*Object.keys(axis).length);
-	let toReturn = Object.keys(axis)[rndDiv];
-
-	if(rdivCounter > 200)
-	{
-		rdivCounter = 0;
-		return "Error in picking division."
-	} 
-	else if(!axis[Object.keys(axis)[rndDiv]])
-	{
-		rdivCounter++;
-		return _selectRandDivAxis(message);
-	} 
-	else
-	{
-		rdivCounter = 0;
-		return toReturn;
-	}
+	let notBannedList = Object.keys(side).filter(x => {return side[x]});
+	let rndDiv = Math.floor(Math.random()*notBannedList.length);
+	return notBannedList[rndDiv];
 }
 
 function unbandiv(message, args)
