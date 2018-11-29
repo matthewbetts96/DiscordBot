@@ -94,6 +94,16 @@ function _selectRandDiv(message,side)
 	return notBannedList[rndDiv];
 }
 
+function _selectRandDivAllies(message)
+{
+	return _selectRandDiv(message,allies);
+}
+
+function selectRandDivAxis(message)
+{
+	return _selectRandDiv(message,axis);
+}
+
 function unbandiv(message, args)
 {
 	//ban all "op divs"
