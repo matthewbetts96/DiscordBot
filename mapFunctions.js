@@ -89,11 +89,11 @@ function random(message, args)
 	    axisInput = 'N/A';
 		if(i <= allies)
 		{
-			alliesInput = div.selectRandDivAllies(message);
+			alliesInput = div._selectRandDiv(message,div.allies);
 		}
 		if(i <= axis)
 		{
-			axisInput = div.selectRandDivAxis(message)
+			axisInput = div._selectRandDiv(message,div.axis)
 		} 
 		table.addRow(alliesInput, axisInput);
 	}
@@ -116,11 +116,11 @@ function oldRandomForVulcan(message, args)
 		var playersNum = args[0].charAt(0);
 		//allied divs 
 		for (var i = 0; i < playersNum; i++) {
-			alliedDivs = alliedDivs.concat(div.selectRandDivAllies(message) + "\n");
+			alliedDivs = alliedDivs.concat(div._selectRandDiv(message,div.allies) + "\n");
 		};  
 		//axis divs
 		for (var j = 0; j < playersNum; j++) {
-			axisDivs = axisDivs.concat(div.selectRandDivAxis(message) + "\n");
+			axisDivs = axisDivs.concat(div._selectRandDiv(message,div.axis) + "\n");
 		}; 
 	}
 	catch(err) 
