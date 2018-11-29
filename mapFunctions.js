@@ -8,7 +8,6 @@ var div = require("./divisionFunctions");
 var allMaps = {"Bois de Limors":true,"Carpiquet":true,"Caumont l'Evente":true,"Cheux":true,"Colleville":true,"Colombelles":true
 				,"Cote 112":true,"Mont Ormel":true,"Odon":true,"Omaha":true,"Pegasus Bridge":true,"Pointe du Hoc":true,
 				"Carpiquet-Duellist":true,"Merderet":true,"Odon River":true,"Sainte Mere l'Eglise":true,"Sainte Mere l'Eglise Duellists":true};
-var rmapCounter = 0;
 
 function _mapsEntryLoc(message, command, args)
 {
@@ -74,11 +73,11 @@ function random(message, args)
 
 	if(largestInput >= 4)
 	{
-		table.setHeading('Map : ',printMap(message, 11));
+		table.setHeading('Map : ',printMap(message, 12));
 	} 
 	else 
 	{
-		table.setHeading('Map : ', printMap(message, 16));
+		table.setHeading('Map : ', printMap(message, 17));
 	}
 	table.addRow("ALLIES", "AXIS");
 
@@ -221,42 +220,27 @@ function rMap(message, args)
 	switch(st)
 	{
 		case "1v1":
-			message.channel.send(printMap(message, 16));
+			message.channel.send(printMap(message, 17));
 			break;
 		case "2v2":
-			message.channel.send(printMap(message, 16));
+			message.channel.send(printMap(message, 17));
 			break;
 		case "3v3":
-			message.channel.send(printMap(message, 16));
+			message.channel.send(printMap(message, 17));
 			break;
 		case "4v4":
-			message.channel.send(printMap(message, 11)); //only first 11 maps are 4v4 compatable
+			message.channel.send(printMap(message, 12)); //only first 11 maps are 4v4 compatable
 			break;
 		default:
 			message.reply("Unknown size parameter. Please use 1v1, 2v2 etc")
 	}
-	rmapCounter = 0;
 }
 
 function printMap(message, num)
 {
-	let rndMap = Math.round(Math.random()*num);
-	let toReturn = Object.keys(allMaps)[rndMap];
-
-	if(rmapCounter > 200)
-	{
-		rmapCounter = 0;
-		return "Error in picking map."
-	} 
-	else if(allMaps[Object.keys(allMaps)[rndMap]] == false) 
-	{
-		rmapCounter++;
-		return printMap(message, num);
-	}
-	else
-	{
-		return toReturn;
-	}
+	let notBannedList = Object.keys(allMaps).slice(0,num).filter(x => {return allMaps[x]});
+	let rndMap = Math.floor(Math.random()*notBannedList.length);
+	return notBannedList[rndMap];
 }
 
 function resetMaps(message)
