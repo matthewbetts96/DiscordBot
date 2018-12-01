@@ -6,6 +6,19 @@ var AsciiTable = require('ascii-table');
 
 var lastrequestTime = 0;
 
+var accuracyTable = {"panzerfaust":10,"panzerschreck":10,"bazooka":7,"grenade":5,"potato":8,"gammonbomb":7,"piat":6};
+var rangeTable = {"panzerfaust":150,"panzerschreck":250,"bazooka":200,"grenade":50,"potato":100,"gammonbomb":50,"piat":200};
+var apTable = {"panzerfaust":24,"panzerschreck":20,"bazooka":18,"grenade":1,"potato":1,"gammonbomb":30,"piat":15};
+var pierceFrontTable = ["Critical Ammo Explosion","Internal Fragments","Fuel explosion","Crew killed","Bailed Out","Ammo Explosion","Ammo Explosion","Shooter Wounded","Shooter Wounded","Driver Wounded","Driver Wounded","Driver Wounded","Crew Wounded","Internal fire 20 sec gun stun, 2 damage, 75% ammo lost","Turret/guns jammed","Transmission damaged","Ammo Storage Hit","Tracks/Wheels damaged","Tracks/Wheels damaged","Tracks/wheels broken"];
+var pierceSideTable = ["Critical Ammo Explosion","Critical Ammo Explosion","Fuel Explosion","Fuel Explosion","Fuel Explosion","Crew killed","Bailed Out","Tracks/Wheels damaged","Tracks/Wheels damaged","Turret/guns jammed","Ammo storage Hit","Tracks/wheels broken","Tracks/Wheels damaged","Transmission damaged","Tracks/Wheels damaged","Crew Wounded","Internal fire","Engine Destroyed ","Engine Destroyed ","Engine Destroyed"];
+var pierceRearTable = ["Critical ammo explosion","Critical ammo explosion","Critical ammo explosion","Fuel Explosion","Fuel Explosion","Fuel Explosion","Fuel Explosion","Crew killed","Crew killed","Crew killed","Crew killed","Transmission damaged","Transmission damaged","Ammo storage Hit","Bailed out","Turret/guns jammed","Internal fire","Engine destroyed","Engine destroyed","Engine destroyed"];
+var bounceFrontTable = ["Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Shooter knocked out","Driver knocked out","Crew knocked out"];
+var bounceSideTable = ["Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Track Wheel damaged","Shooter knocked out","Driver knocked out","Crew knocked out","Ammo storage Hit","Engine Stalled","Engine Stalled"];
+var bounceRearTable = ["Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Engine Stalled","Engine Stalled","Engine Stalled","Engine Stalled","Engine Stalled","Tracks/Wheels broken","Transmission damaged","Transmission damaged","Shooter knocked out","Track/Wheel damaged","Crew knocked out","Ammo storage Hit","Turret/Guns jammed"];
+var pierce = {"front":pierceFrontTable, "side":pierceSideTable, "rear":pierceRearTable};
+var bounce = {"front":bounceFrontTable, "side":bounceSideTable, "rear":bounceRearTable};
+
+
 var sodbotReplies = ["hit!","miss! Mission failed. We'll get em next time!", "miss! Are you even trying to hit anymore?", "oh come on, that shot was pathetic... Put your back into it!",
 "ping! Your shot bounced!", "you miss 100% of the shots you don't take, or in your case, 100% of those that you do as well...", "miss! Your shot couldn't hit the broad side of a barn!"];
 
@@ -26,7 +39,7 @@ function _miscEntryLoc(message, command, args)
 		case "gammonbomb":
 		case "potato":
         case "piat":
-            shootThing(message);
+            shootThing(message,command.toLowerCase(),args);
             break;
         case "guide":
             guide(message);
@@ -50,6 +63,16 @@ function _miscEntryLoc(message, command, args)
 	
 	//log the command
 	log.generalCommandLogging(message, command);
+}
+
+function dice2d6()
+{
+	return Math.floor(Math.random()*6)+Math.floor(Math.random()*6)+2;
+}
+
+function diced20()
+{
+	return Math.floor(Math.random()*20)+1;
 }
 
 //Returns axis or allies 
@@ -92,18 +115,69 @@ function info(message)
     message.channel.send("``"+ table.toString() +"``");
 }
 
-function shootThing(message)
+function shootThing(message,command,args)
 {
     if(rateLimiter())
 	{
-      if(Math.random() < 0.05)
-        {
-            message.reply(sodbotReplies[Math.floor(Math.random()*sodbotReplies.length)]);
-        } 
-        else 
-        {
-            message.reply("Miss!");
-        }
+		let range = rangeTable[command];
+		let accuracy = accuracyTable[command];
+		let AP = apTable[command];
+		let vet =0;
+		let distance = rangeTable[command];
+		let armor = null;
+		let side = "front";
+		let rangeBonus =0;
+		args.forEach(element => {
+			if(/(\d+)m/.test(element)){
+  				distance = Number(element.match(/(\d+)m/)[1]);
+			}
+			if(/(\d+)armor/.test(element)){
+			  armor = Number(element.match(/(\d+)armor/)[1]);
+			}
+			if(/side/.test(element)){
+			  side = "side";
+			} else if (/rear/.test(element)){
+			  side = "rear";
+			}
+			if(/[1,2,3]star/.test(element)){
+			  vet = Number(element.match(/([1,2,3])star/)[1]);
+			}
+		});
+		//TODO add consecutive shots and stress modifiers
+
+		let distToRange = distance/range;
+		if(distToRange>1){
+		  message.reply("Out of range: "+command+" range is "+range+"m");
+		  return;
+		}else if(distToRange>=0.75){
+		  rangeBonus =0;
+		}else if(distToRange>=0.50){
+		  rangeBonus =1;
+		}else if(distToRange>=0.34){
+		  rangeBonus =2;
+		}else if(distToRange>=0.25){
+		  rangeBonus =3;
+		}else if(distToRange>=0.10){
+		  rangeBonus =4;
+		}else {
+		  rangeBonus =5;
+		}
+
+		let reply = "Firing "+(vet!=0?vet+"star ":"")+command+" from "+distance+"m"+(armor!=null?" to "+armor+"AV "+side+" armor":"")+"\n";
+
+		if(dice2d6()<accuracy+rangeBonus+vet-2){
+			if(armor!=null){
+				if(dice2d6()>AP-armor+2+(Math.floor(range-distance/100))){
+					message.reply(reply +"Hit + " + pierce[side][diced20()-1] +"!");
+				} else {
+					message.reply(reply + bounce[side][diced20()-1]+"!");
+				}
+			} else {
+				message.reply(reply +"Hit!");
+			}
+		} else {
+			message.reply(reply + "Miss!");
+		}
     }
 }
 
