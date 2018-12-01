@@ -9,7 +9,7 @@ var lastrequestTime = 0;
 var accuracyTable = {"panzerfaust":10,"panzerschreck":10,"bazooka":7,"grenade":5,"potato":8,"gammonbomb":7,"piat":6};
 var rangeTable = {"panzerfaust":150,"panzerschreck":250,"bazooka":200,"grenade":50,"potato":100,"gammonbomb":50,"piat":200};
 var apTable = {"panzerfaust":24,"panzerschreck":20,"bazooka":18,"grenade":1,"potato":1,"gammonbomb":30,"piat":15};
-var pierceFrontTable = ["Critical Ammo Explosion","Internal Fragments","Fuel explosion","Crew killed","Bailed Out","Ammo Explosion","Ammo Explosion","Shooter Wounded","Shooter Wounded","Driver Wounded","Driver Wounded","Driver Wounded","Crew Wounded","Internal fire 20 sec gun stun, 2 damage, 75% ammo lost","Turret/guns jammed","Transmission damaged","Ammo Storage Hit","Tracks/Wheels damaged","Tracks/Wheels damaged","Tracks/wheels broken"];
+var pierceFrontTable = ["Critical Ammo Explosion","Internal Fragments","Fuel explosion","Crew killed","Bailed Out","Ammo Explosion","Ammo Explosion","Shooter Wounded","Shooter Wounded","Driver Wounded","Driver Wounded","Driver Wounded","Crew Wounded","Internal fire","Turret/guns jammed","Transmission damaged","Ammo Storage Hit","Tracks/Wheels damaged","Tracks/Wheels damaged","Tracks/wheels broken"];
 var pierceSideTable = ["Critical Ammo Explosion","Critical Ammo Explosion","Fuel Explosion","Fuel Explosion","Fuel Explosion","Crew killed","Bailed Out","Tracks/Wheels damaged","Tracks/Wheels damaged","Turret/guns jammed","Ammo storage Hit","Tracks/wheels broken","Tracks/Wheels damaged","Transmission damaged","Tracks/Wheels damaged","Crew Wounded","Internal fire","Engine Destroyed ","Engine Destroyed ","Engine Destroyed"];
 var pierceRearTable = ["Critical ammo explosion","Critical ammo explosion","Critical ammo explosion","Fuel Explosion","Fuel Explosion","Fuel Explosion","Fuel Explosion","Crew killed","Crew killed","Crew killed","Crew killed","Transmission damaged","Transmission damaged","Ammo storage Hit","Bailed out","Turret/guns jammed","Internal fire","Engine destroyed","Engine destroyed","Engine destroyed"];
 var bounceFrontTable = ["Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Bounce","Shooter knocked out","Driver knocked out","Crew knocked out"];
@@ -165,9 +165,9 @@ function shootThing(message,command,args)
 
 		let reply = "Firing "+(vet!=0?vet+"star ":"")+command+" from "+distance+"m"+(armor!=null?" to "+armor+"AV "+side+" armor":"")+"\n";
 
-		if(dice2d6()<accuracy+rangeBonus+vet-2){
+		if(dice2d6()<=accuracy+rangeBonus+vet-2){
 			if(armor!=null){
-				if(dice2d6()>AP-armor+2+(Math.floor(range-distance/100))){
+				if(dice2d6()<=AP-armor+2+(Math.floor((range-distance)/100))){
 					message.reply(reply +"Hit + " + pierce[side][diced20()-1] +"!");
 				} else {
 					message.reply(reply + bounce[side][diced20()-1]+"!");
